@@ -1,0 +1,15 @@
+Objective - Collect all coins with not more than 3 deaths
+
+--------------------------------------------------------
+
+Keybinds
+
+Esc - Quit application
+
+A / Left Arrow - Move Left
+
+D / Right Arrow - Move Right
+
+Space - Jump (double jump while in air)
+
+R - Restart game after reaching Green platform

@@ -53,7 +53,7 @@ public class CoinCollectible : MonoBehaviour
             _player = other.GetComponent<Player>();
             if (_player == null)
                 Debug.LogError("Player object was not instantiated in CoinCollectible class");
-            _player.pickUpCoin();
+            _player.CoinPickUp();
             Destroy(this.gameObject);
         }
     }

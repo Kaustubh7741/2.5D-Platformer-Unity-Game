@@ -12,16 +12,18 @@ public class Player : MonoBehaviour
 
     //[SerializeField]
     private float   _playerSpeed = 8.5f,
-                    _playerJumpHeight = 15f,
+                    _playerJumpHeight = 25f,
                     _yVelocity = 0f;
     private bool _canDoubleJump = false;
-    private int _coinCount = 0;
+    private int _coinCount = 0, _deathCount = 0;
 
     private Vector3 _playerDirection, _playerVelocity;
 
     private UIManager _uiManager;
 
     private GameObject _playerSpawn;        //to set position for player respawn
+
+    private GameManager _gameManager;
 
     // Start is called before the first frame update
     void Start()
@@ -37,7 +39,14 @@ public class Player : MonoBehaviour
         if (_uiManager == null)
             Debug.LogError("UI Manager was not initialised in Player class");
 
+        _gameManager = GameObject.Find("Game_Manager").GetComponent<GameManager>();
+        if (_gameManager == null)
+            Debug.LogError("Game Manager was not initialised in Player class");
+
         _playerSpawn = GameObject.Find("Player_Spawn");
+        if (_playerSpawn == null)
+            Debug.LogError("Player Spawn was not initialised in Player class");
+
     }
 
     // Update is called once per frame
@@ -82,21 +91,39 @@ public class Player : MonoBehaviour
         _playerController.Move(_playerVelocity * Time.deltaTime);
 
         if (transform.position.y < -_yBound)
-            DeletePlayerLife();
+        {
+            _playerController.enabled = false;
+            TriggerPlayerDeath();
+        }
 
     }
 
-    public void pickUpCoin()
+    public void CoinPickUp()
     {
         //_uiManager.UpdateCoinCount(++_coinCount);
         _coinCount++;
         _uiManager.UpdateCoinCount(_coinCount);
     }
 
-    void DeletePlayerLife()
+    void TriggerPlayerDeath()
     {
-        transform.position = _playerSpawn.transform.position + (Vector3.up * 1.5f);
+        _deathCount++;
+        _uiManager.UpdateDeathCount(_deathCount);
         _yVelocity = 0f;
+        transform.position = _playerSpawn.transform.position + (Vector3.up * 1.5f);
+
+        //Resolution of a bug that player remained a child of platform on death. Resetting to null
+        transform.parent = null;
+
+        _playerController.enabled = true;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.transform.parent.name.Equals("Finish"))
+        {
+            _gameManager.GameCompleteSequence(_coinCount, _deathCount);
+        }
     }
 
 }
